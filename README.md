@@ -1,4 +1,4 @@
-# Player Infinite Trading Minecraft Mod
+# Infinite Trading Minecraft Mod
 
 ![Minecraft Version](https://img.shields.io/badge/Minecraft-1.21.1-blue.svg)
 ![Mod Loader](https://img.shields.io/badge/Loader-NeoForge-orange.svg)
