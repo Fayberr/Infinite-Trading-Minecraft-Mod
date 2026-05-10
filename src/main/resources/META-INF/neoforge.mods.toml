@@ -1,0 +1,28 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+license="MIT"
+
+[[mods]]
+modId="playerinftrading"
+version="1.0.0"
+displayName="Player Infinite Trading"
+authors="derfa"
+description="Allows OPs to enable infinite trading for specific players."
+displayTest="IGNORE_ALL_VERSION"
+
+[[mixins]]
+config="playerinftrading.mixins.json"
+
+[[dependencies.playerinftrading]]
+modId="neoforge"
+type="required"
+versionRange="[21.1,)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.playerinftrading]]
+modId="minecraft"
+type="required"
+versionRange="[1.21.1,)"
+ordering="NONE"
+side="BOTH"
