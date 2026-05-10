@@ -7,7 +7,7 @@ modId="playerinftrading"
 version="1.0.0"
 displayName="Infinite Trading"
 authors="derfa"
-description="Allows OPs to enable infinite trading for specific players."
+description="Allows OPs and singleplayer users to enable infinite trading for specific players."
 displayTest="IGNORE_ALL_VERSION"
 
 [[mixins]]
