@@ -6,8 +6,11 @@ license="MIT"
 modId="playerinftrading"
 version="1.0.0"
 displayName="Infinite Trading"
-authors="derfa"
-description="Allows OPs and singleplayer users to enable infinite trading for specific players."
+displayURL="https://github.com/Fayberr/Infinite-Trading-Minecraft-Mod"
+issueTrackerURL="https://github.com/Fayberr/Infinite-Trading-Minecraft-Mod/issues"
+sourceURL="https://github.com/Fayberr/Infinite-Trading-Minecraft-Mod"
+authors="Fayber"
+description="Allows OPs and singleplayer users to enable infinite trading for specific players. Works on Dedicated Servers and in Singleplayer worlds."
 displayTest="IGNORE_ALL_VERSION"
 
 [[mixins]]
