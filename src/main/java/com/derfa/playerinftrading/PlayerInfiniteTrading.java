@@ -12,6 +12,6 @@ public class PlayerInfiniteTrading {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     public PlayerInfiniteTrading(IEventBus modEventBus) {
-        LOGGER.info("Player Infinite Trading Initialized");
+        LOGGER.info("Infinite Trading Initialized");
     }
 }

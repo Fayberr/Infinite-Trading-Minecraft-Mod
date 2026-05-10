@@ -5,7 +5,7 @@ license="MIT"
 [[mods]]
 modId="playerinftrading"
 version="1.0.0"
-displayName="Player Infinite Trading"
+displayName="Infinite Trading"
 authors="derfa"
 description="Allows OPs to enable infinite trading for specific players."
 displayTest="IGNORE_ALL_VERSION"
