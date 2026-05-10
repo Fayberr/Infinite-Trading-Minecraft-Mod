@@ -1,11 +1,11 @@
 modLoader="javafml"
-loaderVersion="[4,)"
-license="MIT"
+loaderVersion="${loader_version_range}"
+license="${mod_license}"
 
 [[mods]]
-modId="playerinftrading"
-version="1.0.0"
-displayName="Infinite Trading"
+modId="${mod_id}"
+version="${mod_version}"
+displayName="${mod_name}"
 displayURL="https://github.com/Fayberr/Infinite-Trading-Minecraft-Mod"
 issueTrackerURL="https://github.com/Fayberr/Infinite-Trading-Minecraft-Mod/issues"
 sourceURL="https://github.com/Fayberr/Infinite-Trading-Minecraft-Mod"
@@ -14,18 +14,18 @@ description="Allows OPs and singleplayer users to enable infinite trading for sp
 displayTest="IGNORE_ALL_VERSION"
 
 [[mixins]]
-config="playerinftrading.mixins.json"
+config="${mod_id}.mixins.json"
 
-[[dependencies.playerinftrading]]
+[[dependencies.${mod_id}]]
 modId="neoforge"
 type="required"
-versionRange="[21.1,)"
+versionRange="[${neo_version},)"
 ordering="NONE"
 side="BOTH"
 
-[[dependencies.playerinftrading]]
+[[dependencies.${mod_id}]]
 modId="minecraft"
 type="required"
-versionRange="[1.21.1,)"
+versionRange="[${minecraft_version_range},)"
 ordering="NONE"
 side="BOTH"

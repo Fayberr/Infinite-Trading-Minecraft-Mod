@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 
 @Mod(PlayerInfiniteTrading.MODID)
 public class PlayerInfiniteTrading {
-    public static final String MODID = "playerinftrading";
+    public static final String MODID = "infinitetrading";
     private static final Logger LOGGER = LogUtils.getLogger();
 
     public PlayerInfiniteTrading(IEventBus modEventBus) {
