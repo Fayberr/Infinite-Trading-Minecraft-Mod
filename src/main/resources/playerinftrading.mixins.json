@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.derfa.playerinftrading.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "AbstractVillagerMixin",
+    "MerchantOfferAccessor"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
