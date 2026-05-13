@@ -5,41 +5,47 @@ import net.minecraft.datafixer.DataFixTypes;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.Uuids;
 import net.minecraft.world.PersistentState;
 import net.minecraft.world.PersistentStateType;
 import net.minecraft.world.World;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class InfiniteTradingData extends PersistentState {
-    private final Set<UUID> infiniteTraders = new HashSet<>();
+    private final Map<UUID, Boolean> overrides = new HashMap<>();
+    private boolean isDedicated = false;
 
-    public static final Codec<InfiniteTradingData> CODEC = Uuids.CODEC.listOf().xmap(list -> {
+    public static final Codec<InfiniteTradingData> CODEC = Codec.unboundedMap(Codec.STRING, Codec.BOOL).xmap(map -> {
         InfiniteTradingData data = new InfiniteTradingData();
-        data.infiniteTraders.addAll(list);
+        map.forEach((uuidStr, enabled) -> {
+            try {
+                data.overrides.put(UUID.fromString(uuidStr), enabled);
+            } catch (IllegalArgumentException ignored) {}
+        });
         return data;
-    }, data -> new ArrayList<>(data.infiniteTraders));
+    }, data -> {
+        Map<String, Boolean> map = new HashMap<>();
+        data.overrides.forEach((uuid, enabled) -> map.put(uuid.toString(), enabled));
+        return map;
+    });
 
     public InfiniteTradingData() {}
 
     public boolean isInfinite(UUID playerUuid) {
-        return infiniteTraders.contains(playerUuid);
+        if (overrides.containsKey(playerUuid)) {
+            return overrides.get(playerUuid);
+        }
+        return !isDedicated;
     }
 
-    public void addPlayer(UUID playerUuid) {
-        if (infiniteTraders.add(playerUuid)) {
-            markDirty();
+    public void setInfinite(UUID playerUuid, boolean enabled) {
+        if (overrides.containsKey(playerUuid) && overrides.get(playerUuid) == enabled) {
+            return;
         }
-    }
-
-    public void removePlayer(UUID playerUuid) {
-        if (infiniteTraders.remove(playerUuid)) {
-            markDirty();
-        }
+        overrides.put(playerUuid, enabled);
+        markDirty();
     }
 
     public static InfiniteTradingData get(World world) {
@@ -52,6 +58,8 @@ public class InfiniteTradingData extends PersistentState {
             CODEC,
             DataFixTypes.LEVEL
         );
-        return serverWorld.getServer().getOverworld().getPersistentStateManager().getOrCreate(type);
+        InfiniteTradingData data = serverWorld.getServer().getOverworld().getPersistentStateManager().getOrCreate(type);
+        data.isDedicated = serverWorld.getServer().isDedicated();
+        return data;
     }
 }

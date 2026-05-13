@@ -23,11 +23,7 @@ public class ModCommands {
                             InfiniteTradingData data = InfiniteTradingData.get(context.getSource().getWorld());
 
                             for (ServerPlayerEntity player : players) {
-                                if (enabled) {
-                                    data.addPlayer(player.getUuid());
-                                } else {
-                                    data.removePlayer(player.getUuid());
-                                }
+                                data.setInfinite(player.getUuid(), enabled);
                             }
 
                             context.getSource().sendFeedback(() -> Text.literal("Set infinite trading to " + enabled + " for " + players.size() + " players"), true);
