@@ -1,54 +1,41 @@
 package com.derfa.playerinftrading;
 
-import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.context.CommandContext;
-import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.Commands;
-import net.minecraft.commands.arguments.EntityArgument;
-import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import com.mojang.brigadier.arguments.BoolArgumentType;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.minecraft.command.argument.EntityArgumentType;
+import net.minecraft.server.command.CommandManager;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 
 import java.util.Collection;
 
-@EventBusSubscriber(modid = PlayerInfiniteTrading.MODID)
 public class ModCommands {
 
-    @SubscribeEvent
-    public static void onRegisterCommands(RegisterCommandsEvent event) {
-        CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
+    public static void register() {
+        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+            dispatcher.register(CommandManager.literal("infinitetrading")
+                .requires(source -> source.hasPermissionLevel(2))
+                .then(CommandManager.argument("targets", EntityArgumentType.players())
+                    .then(CommandManager.argument("enabled", BoolArgumentType.bool())
+                        .executes(context -> {
+                            Collection<ServerPlayerEntity> players = EntityArgumentType.getPlayers(context, "targets");
+                            boolean enabled = BoolArgumentType.getBool(context, "enabled");
+                            InfiniteTradingData data = InfiniteTradingData.get(context.getSource().getWorld());
 
-        dispatcher.register(Commands.literal("inftrade")
-            .requires(source -> source.hasPermission(2))
-            .then(Commands.literal("enable")
-                .then(Commands.argument("players", EntityArgument.players())
-                    .executes(context -> manageTrading(context, true))))
-            .then(Commands.literal("disable")
-                .then(Commands.argument("players", EntityArgument.players())
-                    .executes(context -> manageTrading(context, false))))
-        );
-    }
+                            for (ServerPlayerEntity player : players) {
+                                if (enabled) {
+                                    data.addPlayer(player.getUuid());
+                                } else {
+                                    data.removePlayer(player.getUuid());
+                                }
+                            }
 
-    private static int manageTrading(CommandContext<CommandSourceStack> context, boolean enable) {
-        try {
-            Collection<ServerPlayer> players = EntityArgument.getPlayers(context, "players");
-            InfiniteTradingData data = InfiniteTradingData.get(context.getSource().getLevel());
-
-            for (ServerPlayer player : players) {
-                if (enable) {
-                    data.addPlayer(player.getUUID());
-                    context.getSource().sendSuccess(() -> Component.literal("Enabled infinite trading for " + player.getScoreboardName()), true);
-                } else {
-                    data.removePlayer(player.getUUID());
-                    context.getSource().sendSuccess(() -> Component.literal("Disabled infinite trading for " + player.getScoreboardName()), true);
-                }
-            }
-            return players.size();
-        } catch (Exception e) {
-            context.getSource().sendFailure(Component.literal("Failed to modify trading: " + e.getMessage()));
-            return 0;
-        }
+                            context.getSource().sendFeedback(() -> Text.literal("Set infinite trading to " + enabled + " for " + players.size() + " players"), true);
+                            return players.size();
+                        })
+                    )
+                )
+            );
+        });
     }
 }

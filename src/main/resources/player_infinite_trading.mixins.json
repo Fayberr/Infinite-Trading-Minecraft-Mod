@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "com.derfa.playerinftrading.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "AbstractVillagerMixin",
+    "MerchantOfferAccessor"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

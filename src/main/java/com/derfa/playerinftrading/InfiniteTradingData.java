@@ -1,21 +1,28 @@
 package com.derfa.playerinftrading;
 
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.StringTag;
-import net.minecraft.nbt.Tag;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.saveddata.SavedData;
-import net.minecraft.world.level.storage.DimensionDataStorage;
+import com.mojang.serialization.Codec;
+import net.minecraft.datafixer.DataFixTypes;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.Uuids;
+import net.minecraft.world.PersistentState;
+import net.minecraft.world.PersistentStateType;
+import net.minecraft.world.World;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-public class InfiniteTradingData extends SavedData {
+public class InfiniteTradingData extends PersistentState {
     private final Set<UUID> infiniteTraders = new HashSet<>();
+
+    public static final Codec<InfiniteTradingData> CODEC = Uuids.CODEC.listOf().xmap(list -> {
+        InfiniteTradingData data = new InfiniteTradingData();
+        data.infiniteTraders.addAll(list);
+        return data;
+    }, data -> new ArrayList<>(data.infiniteTraders));
 
     public InfiniteTradingData() {}
 
@@ -24,41 +31,27 @@ public class InfiniteTradingData extends SavedData {
     }
 
     public void addPlayer(UUID playerUuid) {
-        infiniteTraders.add(playerUuid);
-        setDirty();
+        if (infiniteTraders.add(playerUuid)) {
+            markDirty();
+        }
     }
 
     public void removePlayer(UUID playerUuid) {
-        infiniteTraders.remove(playerUuid);
-        setDirty();
-    }
-
-    @Override
-    public CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {
-        ListTag list = new ListTag();
-        for (UUID uuid : infiniteTraders) {
-            list.add(StringTag.valueOf(uuid.toString()));
+        if (infiniteTraders.remove(playerUuid)) {
+            markDirty();
         }
-        tag.put("traders", list);
-        return tag;
     }
 
-    public static InfiniteTradingData load(CompoundTag tag, HolderLookup.Provider registries) {
-        InfiniteTradingData data = new InfiniteTradingData();
-        ListTag list = tag.getList("traders", Tag.TAG_STRING);
-        for (int i = 0; i < list.size(); i++) {
-            try {
-                data.infiniteTraders.add(UUID.fromString(list.getString(i)));
-            } catch (IllegalArgumentException ignored) {}
-        }
-        return data;
-    }
-
-    public static InfiniteTradingData get(Level level) {
-        if (!(level instanceof ServerLevel serverLevel)) {
+    public static InfiniteTradingData get(World world) {
+        if (!(world instanceof ServerWorld serverWorld)) {
             throw new RuntimeException("Must be called on server side");
         }
-        DimensionDataStorage storage = serverLevel.getServer().overworld().getDataStorage();
-        return storage.computeIfAbsent(new SavedData.Factory<>(InfiniteTradingData::new, InfiniteTradingData::load), "playerinftrading");
+        PersistentStateType<InfiniteTradingData> type = new PersistentStateType<>(
+            "playerinftrading",
+            InfiniteTradingData::new,
+            CODEC,
+            DataFixTypes.LEVEL
+        );
+        return serverWorld.getServer().getOverworld().getPersistentStateManager().getOrCreate(type);
     }
 }

@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "player_infinite_trading",
+  "version": "${version}",
+  "name": "Player Infinite Trading",
+  "description": "Removes trade locking and allows villagers to trade infinitely without needing to restock.",
+  "authors": [
+    "Fayber"
+  ],
+  "contact": {
+    "homepage": "https://github.com/Fayberr/Infinite-Trading-Minecraft-Mod"
+  },
+  "license": "MIT",
+  "icon": "assets/player_infinite_trading/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.derfa.playerinftrading.PlayerInfiniteTrading"
+    ]
+  },
+  "mixins": [
+    "player_infinite_trading.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "minecraft": "1.21.10",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}
