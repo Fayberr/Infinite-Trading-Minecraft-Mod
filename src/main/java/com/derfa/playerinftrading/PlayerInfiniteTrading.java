@@ -1,17 +1,16 @@
 package com.derfa.playerinftrading;
 
-import com.mojang.logging.LogUtils;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.ModLoadingContext;
-import net.neoforged.fml.common.Mod;
+import net.fabricmc.api.ModInitializer;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-@Mod(PlayerInfiniteTrading.MODID)
-public class PlayerInfiniteTrading {
-    public static final String MODID = "infinitetrading";
-    private static final Logger LOGGER = LogUtils.getLogger();
+public class PlayerInfiniteTrading implements ModInitializer {
+    public static final String MOD_ID = "player_infinite_trading";
+    public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-    public PlayerInfiniteTrading(IEventBus modEventBus) {
-        LOGGER.info("Infinite Trading Initialized");
+    @Override
+    public void onInitialize() {
+        ModCommands.register();
+        LOGGER.info("Player Infinite Trading initialized!");
     }
 }
