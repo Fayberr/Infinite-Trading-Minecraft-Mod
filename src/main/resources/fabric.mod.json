@@ -1,0 +1,27 @@
+{
+	"schemaVersion": 1,
+	"id": "infinitetrading",
+	"version": "${version}",
+	"name": "Infinite Trading",
+	"description": "Lets operators grant infinite trading to specific players. Villager offers never lock up for authorized players.",
+	"authors": [
+		"Fayber"
+	],
+	"license": "GPL-3.0-or-later",
+	"icon": "logo.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.derfa.playerinftrading.PlayerInfiniteTrading"
+		]
+	},
+	"mixins": [
+		"infinitetrading.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.19.3",
+		"minecraft": "~26.1.2",
+		"java": ">=25",
+		"fabric-api": "*"
+	}
+}
