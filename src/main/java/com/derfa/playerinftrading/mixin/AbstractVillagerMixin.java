@@ -1,8 +1,8 @@
 package com.derfa.playerinftrading.mixin;
 
 import com.derfa.playerinftrading.InfiniteTradingData;
-import net.minecraft.world.entity.npc.AbstractVillager;
-import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.entity.npc.villager.AbstractVillager;
+import net.minecraft.world.entity.npc.villager.Villager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.item.trading.MerchantOffers;
@@ -13,17 +13,15 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import javax.annotation.Nullable;
-
 @Mixin(AbstractVillager.class)
 public abstract class AbstractVillagerMixin {
 
-    @Shadow @Nullable protected Player tradingPlayer;
+    @Shadow protected Player tradingPlayer;
 
     @Inject(method = "getOffers", at = @At("RETURN"))
     private void onGetOffers(CallbackInfoReturnable<MerchantOffers> cir) {
         AbstractVillager villager = (AbstractVillager) (Object) this;
-        if (this.tradingPlayer != null && !villager.level().isClientSide) {
+        if (this.tradingPlayer != null && !villager.level().isClientSide()) {
             if (InfiniteTradingData.get(villager.level()).isInfinite(this.tradingPlayer.getUUID())) {
                 MerchantOffers offers = cir.getReturnValue();
                 if (offers != null) {
@@ -40,7 +38,7 @@ public abstract class AbstractVillagerMixin {
     @Inject(method = "notifyTrade", at = @At("TAIL"))
     private void onNotifyTrade(MerchantOffer offer, CallbackInfo ci) {
         AbstractVillager villager = (AbstractVillager) (Object) this;
-        if (this.tradingPlayer != null && !villager.level().isClientSide) {
+        if (this.tradingPlayer != null && !villager.level().isClientSide()) {
             if (InfiniteTradingData.get(villager.level()).isInfinite(this.tradingPlayer.getUUID())) {
                 offer.resetUses();
                 offer.setSpecialPriceDiff(0);
@@ -50,7 +48,7 @@ public abstract class AbstractVillagerMixin {
                 int level = 1;
                 int xp = 0;
                 if (villager instanceof Villager v) {
-                    level = v.getVillagerData().getLevel();
+                    level = v.getVillagerData().level();
                     xp = v.getVillagerXp();
                 }
 

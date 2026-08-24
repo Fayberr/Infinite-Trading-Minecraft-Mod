@@ -1,16 +1,17 @@
 package com.derfa.playerinftrading;
 
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.StringTag;
-import net.minecraft.nbt.Tag;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
-import net.minecraft.world.level.storage.DimensionDataStorage;
+import net.minecraft.world.level.saveddata.SavedDataType;
+import net.minecraft.world.level.storage.SavedDataStorage;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -33,32 +34,31 @@ public class InfiniteTradingData extends SavedData {
         setDirty();
     }
 
-    @Override
-    public CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {
-        ListTag list = new ListTag();
-        for (UUID uuid : infiniteTraders) {
-            list.add(StringTag.valueOf(uuid.toString()));
-        }
-        tag.put("traders", list);
-        return tag;
-    }
-
-    public static InfiniteTradingData load(CompoundTag tag, HolderLookup.Provider registries) {
+    public static final Codec<InfiniteTradingData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            Codec.STRING.listOf().optionalFieldOf("traders", List.of()).forGetter(data ->
+                    data.infiniteTraders.stream().map(UUID::toString).toList())
+    ).apply(instance, traders -> {
         InfiniteTradingData data = new InfiniteTradingData();
-        ListTag list = tag.getList("traders", Tag.TAG_STRING);
-        for (int i = 0; i < list.size(); i++) {
+        for (String uuid : traders) {
             try {
-                data.infiniteTraders.add(UUID.fromString(list.getString(i)));
+                data.infiniteTraders.add(UUID.fromString(uuid));
             } catch (IllegalArgumentException ignored) {}
         }
         return data;
-    }
+    }));
+
+    public static final SavedDataType<InfiniteTradingData> TYPE = new SavedDataType<>(
+            Identifier.fromNamespaceAndPath("infinitetrading", "playerinftrading"),
+            InfiniteTradingData::new,
+            CODEC,
+            DataFixTypes.SAVED_DATA_COMMAND_STORAGE
+    );
 
     public static InfiniteTradingData get(Level level) {
         if (!(level instanceof ServerLevel serverLevel)) {
             throw new RuntimeException("Must be called on server side");
         }
-        DimensionDataStorage storage = serverLevel.getServer().overworld().getDataStorage();
-        return storage.computeIfAbsent(new SavedData.Factory<>(InfiniteTradingData::new, InfiniteTradingData::load), "playerinftrading");
+        SavedDataStorage storage = serverLevel.getDataStorage();
+        return storage.computeIfAbsent(TYPE);
     }
 }
