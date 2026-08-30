@@ -23,7 +23,12 @@ public class ModCommands {
 
 	private static void registerCommands(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext buildContext, Commands.CommandSelection selection) {
 		dispatcher.register(Commands.literal("inftrade")
-			.requires(source -> source.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER))
+			.requires(source -> {
+				if (source.getServer().isSingleplayer()) {
+					return true;
+				}
+				return source.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER);
+			})
 			.then(Commands.literal("enable")
 				.then(Commands.argument("players", EntityArgument.players())
 					.executes(context -> manageTrading(context, true))))
