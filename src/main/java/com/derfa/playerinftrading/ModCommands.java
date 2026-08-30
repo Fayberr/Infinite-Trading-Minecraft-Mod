@@ -24,7 +24,7 @@ public class ModCommands {
 	private static void registerCommands(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext buildContext, Commands.CommandSelection selection) {
 		dispatcher.register(Commands.literal("inftrade")
 			.requires(source -> {
-				if (source.getServer().isSingleplayer()) {
+				if (source.getServer() != null && source.getServer().isSingleplayer()) {
 					return true;
 				}
 				return source.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER);
