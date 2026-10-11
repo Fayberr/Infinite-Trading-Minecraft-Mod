@@ -16,20 +16,26 @@ import java.util.UUID;
 
 public class InfiniteTradingData extends SavedData {
     private final Set<UUID> infiniteTraders = new HashSet<>();
+    private final Set<UUID> optedOut = new HashSet<>();
+    // Not persisted: true on singleplayer/integrated servers, false on dedicated servers.
+    private boolean defaultOn;
 
     public InfiniteTradingData() {}
 
     public boolean isInfinite(UUID playerUuid) {
-        return infiniteTraders.contains(playerUuid);
+        if (optedOut.contains(playerUuid)) return false;
+        return defaultOn || infiniteTraders.contains(playerUuid);
     }
 
     public void addPlayer(UUID playerUuid) {
         infiniteTraders.add(playerUuid);
+        optedOut.remove(playerUuid);
         setDirty();
     }
 
     public void removePlayer(UUID playerUuid) {
         infiniteTraders.remove(playerUuid);
+        optedOut.add(playerUuid);
         setDirty();
     }
 
@@ -40,6 +46,11 @@ public class InfiniteTradingData extends SavedData {
             list.add(StringTag.valueOf(uuid.toString()));
         }
         tag.put("traders", list);
+        ListTag off = new ListTag();
+        for (UUID uuid : optedOut) {
+            off.add(StringTag.valueOf(uuid.toString()));
+        }
+        tag.put("optedOut", off);
         return tag;
     }
 
@@ -51,6 +62,12 @@ public class InfiniteTradingData extends SavedData {
                 data.infiniteTraders.add(UUID.fromString(list.getString(i)));
             } catch (IllegalArgumentException ignored) {}
         }
+        ListTag off = tag.getList("optedOut", Tag.TAG_STRING);
+        for (int i = 0; i < off.size(); i++) {
+            try {
+                data.optedOut.add(UUID.fromString(off.getString(i)));
+            } catch (IllegalArgumentException ignored) {}
+        }
         return data;
     }
 
@@ -59,6 +76,8 @@ public class InfiniteTradingData extends SavedData {
             throw new RuntimeException("Must be called on server side");
         }
         DimensionDataStorage storage = serverLevel.getServer().overworld().getDataStorage();
-        return storage.computeIfAbsent(new SavedData.Factory<>(InfiniteTradingData::new, InfiniteTradingData::load), "playerinftrading");
+        InfiniteTradingData data = storage.computeIfAbsent(new SavedData.Factory<>(InfiniteTradingData::new, InfiniteTradingData::load), "playerinftrading");
+        data.defaultOn = !serverLevel.getServer().isDedicatedServer();
+        return data;
     }
 }
