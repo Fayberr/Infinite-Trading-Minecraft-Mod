@@ -7,7 +7,9 @@ increases are reset after every trade.
 ## Commands
 
 - `/inftrade enable <players>` grants infinite trading. Requires operator level 2.
-- `/inftrade disable <players>` revokes it.
+- `/inftrade disable <players>` revokes it, even in singleplayer.
+
+In singleplayer and LAN worlds infinite trading is on by default, no setup needed. On dedicated servers it is off until enabled per player.
 
 The list of authorized players is stored in the world data, so it survives restarts.
 
