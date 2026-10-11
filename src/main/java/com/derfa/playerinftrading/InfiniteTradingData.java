@@ -17,31 +17,44 @@ import java.util.UUID;
 
 public class InfiniteTradingData extends SavedData {
     private final Set<UUID> infiniteTraders = new HashSet<>();
+    private final Set<UUID> optedOut = new HashSet<>();
+    // Not persisted: true on singleplayer/integrated servers, false on dedicated servers.
+    private boolean defaultOn;
 
     public InfiniteTradingData() {}
 
     public boolean isInfinite(UUID playerUuid) {
-        return infiniteTraders.contains(playerUuid);
+        if (optedOut.contains(playerUuid)) return false;
+        return defaultOn || infiniteTraders.contains(playerUuid);
     }
 
     public void addPlayer(UUID playerUuid) {
         infiniteTraders.add(playerUuid);
+        optedOut.remove(playerUuid);
         setDirty();
     }
 
     public void removePlayer(UUID playerUuid) {
         infiniteTraders.remove(playerUuid);
+        optedOut.add(playerUuid);
         setDirty();
     }
 
     public static final Codec<InfiniteTradingData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.STRING.listOf().optionalFieldOf("traders", List.of()).forGetter(data ->
-                    data.infiniteTraders.stream().map(UUID::toString).toList())
-    ).apply(instance, traders -> {
+                    data.infiniteTraders.stream().map(UUID::toString).toList()),
+            Codec.STRING.listOf().optionalFieldOf("optedOut", List.of()).forGetter(data ->
+                    data.optedOut.stream().map(UUID::toString).toList())
+    ).apply(instance, (traders, off) -> {
         InfiniteTradingData data = new InfiniteTradingData();
         for (String uuid : traders) {
             try {
                 data.infiniteTraders.add(UUID.fromString(uuid));
+            } catch (IllegalArgumentException ignored) {}
+        }
+        for (String uuid : off) {
+            try {
+                data.optedOut.add(UUID.fromString(uuid));
             } catch (IllegalArgumentException ignored) {}
         }
         return data;
@@ -59,6 +72,8 @@ public class InfiniteTradingData extends SavedData {
             throw new RuntimeException("Must be called on server side");
         }
         SavedDataStorage storage = serverLevel.getDataStorage();
-        return storage.computeIfAbsent(TYPE);
+        InfiniteTradingData data = storage.computeIfAbsent(TYPE);
+        data.defaultOn = !serverLevel.getServer().isDedicatedServer();
+        return data;
     }
 }
