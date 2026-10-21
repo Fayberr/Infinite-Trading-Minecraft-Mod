@@ -1,6 +1,5 @@
 plugins {
 	id 'net.fabricmc.fabric-loom' version "${loom_version}"
-	id 'maven-publish'
 }
 
 version = project.version
@@ -10,21 +9,10 @@ base {
 	archivesName = project.archives_base_name
 }
 
-repositories {
-	// Add repositories for extra mods/deps here (e.g. Terraformers for ModMenu):
-	// maven { name = 'Terraformers'; url = 'https://maven.terraformersmc.com/' }
-}
-
 dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
-
-	// Fabric API. Optional but most mods want it.
 	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
-
-	// Extra mods as compileOnly (no remap needed on 26.1+):
-	// modCompileOnly "com.terraformersmc:modmenu:..."
-	// (note: use `compileOnly` / `implementation` instead of mod* variants on 26.1+)
 }
 
 processResources {
@@ -47,13 +35,5 @@ java {
 jar {
 	from('LICENSE') {
 		rename { "${it}_${project.base.archivesName.get()}" }
-	}
-}
-
-publishing {
-	publications {
-		create('mavenJava', MavenPublication) {
-			from components.java
-		}
 	}
 }
