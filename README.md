@@ -4,8 +4,7 @@ A Fabric mod that lets operators grant infinite trading to specific players.
 Villager trades never lock up for authorized players, and demand-based price
 increases are reset after every trade.
 
-This is the Fabric port for Minecraft 26.1.2 (deobfuscated mappings, Java 25).
-There is also a NeoForge 1.21.1 version in this repository.
+This is the Fabric port for Minecraft 26.1 (Java 25).
 
 ## Commands
 
@@ -25,13 +24,13 @@ The list of authorized players is stored in the world data, so it survives resta
 
 ## Requirements
 
-- Fabric Loader 0.19.3 or newer for Minecraft 26.1.2.
-- Fabric API for 26.1.2.
+- Fabric Loader 0.20.1 or newer.
+- Fabric API for 26.1.
 - Java 25.
 
 ## Building
 
-JDK 25 and Gradle 9.7 or newer (Loom 1.17.19).
+JDK 25 and Gradle 9.8.2 or newer.
 
 ```bash
 ./gradlew build
